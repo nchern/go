@@ -8,7 +8,7 @@ import (
 type Filter interface {
 	Values() []float64
 	Init(int) Filter
-	Step(int, ...[]float64) error
+	Calc(int, ...[]float64) error
 }
 
 type FilterBase struct {
@@ -24,14 +24,14 @@ func (f *FilterBase) Values() []float64 {
 	return f.values
 }
 
-func (f *FilterBase) Step(i int, inputs ...[]float64) error {
+func (f *FilterBase) Calc(i int, inputs ...[]float64) error {
 	return fmt.Errorf("Not implemented")
 }
 
 func BatchFilter(f Filter, inputs ...[]float64) error {
 	length := len(inputs[0])
 	for i := 0; i < length; i++ {
-		e := f.Step(i, inputs...)
+		e := f.Calc(i, inputs...)
 		if e != nil {
 			return e
 		}

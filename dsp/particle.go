@@ -54,7 +54,7 @@ func (f *ParticleFilter) particles(x0 float64) []float64 {
 	return r
 }
 
-func (f *ParticleFilter) Step(i int, inputs ...[]float64) error {
+func (f *ParticleFilter) Calc(i int, inputs ...[]float64) error {
 	inc := func(i int) int {
 		return (i + 1) % 2
 	}

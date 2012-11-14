@@ -32,7 +32,7 @@ func (f *KalmanFilter) Init(length int) Filter {
 	return f
 }
 
-func (f *KalmanFilter) Step(i int, inputs ...[]float64) error {
+func (f *KalmanFilter) Calc(i int, inputs ...[]float64) error {
 	x := inputs[0]
 	if i == 0 {
 		f.XMinus[i] = x[i]
