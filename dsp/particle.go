@@ -76,7 +76,7 @@ func (f *ParticleFilter) Calc(i int, inputs ...[]float64) error {
 
 	//propagate
 	for j := 0; j < f.ParticleCount; j++ {
-		f.XMinus[f.xMinusCur][j] = f.XPlus[f.xPlusPrev][j] + (-1+2*rand.Float64())*f.ValueRange //TODO: add propagation noise
+		f.XMinus[f.xMinusCur][j] = f.XPlus[f.xPlusPrev][j] + (-1+2*rand.NormFloat64())*f.ValueRange //TODO: add propagation noise
 	}
 
 	for j := 0; j < f.ParticleCount; j++ {
