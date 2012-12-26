@@ -40,7 +40,7 @@ func TestKalman(t *testing.T) {
 	p0 := 100000000.0
 	kalman := &KalmanFilter{}
 	kalman.Init(n)
-	kalman.PMinus[0] = p0
+	kalman.PMinus = p0
 	kalman.PPlus[0] = p0
 	kalman.Q = stdev / 2
 	kalman.R = stdev * 1
@@ -63,7 +63,7 @@ func TestParticle(t *testing.T) {
 
 	n := 100
 
-	filter := &ParticleFilter{ParticleCount: 3000, ValueRange: 30}
+	filter := &ParticleFilter{ParticleCount: 1000, ValueRange: 30}
 	filter.Init(n)
 
 	stdev := 30.0
