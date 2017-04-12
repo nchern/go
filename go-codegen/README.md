@@ -1,3 +1,6 @@
+go-codegen
+==
+
 With a lack of templates some of the gophers really miss them...
 Yet another attempt of code generaton in Golang.
 
