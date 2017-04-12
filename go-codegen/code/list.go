@@ -18,7 +18,7 @@ func (c *ListGenerator) Template() ([]byte, error) {
 
 func (c *ListGenerator) Cmd() (cmd string, shortDescription string) {
 	cmd = "list"
-	shortDescription = "generates typed list"
+	shortDescription = "Generates typed list: []<value-type>"
 	return
 }
 
