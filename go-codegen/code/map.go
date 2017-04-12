@@ -18,7 +18,7 @@ func (c *MapGenerator) Template() ([]byte, error) {
 
 func (c *MapGenerator) Cmd() (cmd string, shortDescription string) {
 	cmd = "map"
-	shortDescription = "generates typed map"
+	shortDescription = "Generates typed map: map[<key-type>]<value-type>"
 	return
 }
 
