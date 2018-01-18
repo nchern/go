@@ -61,7 +61,9 @@ func (c *RateRedisCounter) Total() (int64, error) {
 	for i := 0; i < c.bucketsCount; i++ {
 		key := c.makeKey(curTimeShard - int64(i))
 		val, err := redis.Int64(c.conn.Do("GET", key))
-		if err != nil {
+		if err == redis.ErrNil {
+			continue
+		} else if err != nil {
 			return 0, err
 		}
 		total += val

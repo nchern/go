@@ -1,13 +1,50 @@
 package limiters
 
 import (
+	"errors"
 	"testing"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
 
 	"gopkg.in/stretchr/testify.v1/assert"
 )
 
+type redisConnMockBase struct{}
+
+func (c *redisConnMockBase) Close() error {
+	panic("not implemented")
+}
+
+func (c *redisConnMockBase) Err() error {
+	panic("not implemented")
+}
+
+func (c *redisConnMockBase) Flush() error {
+	panic("not implemented")
+}
+
+func (c *redisConnMockBase) Receive() (reply interface{}, err error) {
+	panic("not implemented")
+}
+
+func (r *redisConnMockBase) Send(commandName string, args ...interface{}) error {
+	panic("not implemented")
+}
+
+type redisErroneousConn struct {
+	redisConnMockBase
+
+	returnedErr error
+}
+
+func (r *redisErroneousConn) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+	return nil, r.returnedErr
+}
+
 type redisConnMock struct {
+	redisConnMockBase
+
 	orderedKeys []string
 	cache       map[string]int64
 }
@@ -39,20 +76,19 @@ func (r *redisConnMock) Send(commandName string, args ...interface{}) error {
 	return nil
 }
 
-func (c *redisConnMock) Close() error {
-	panic("not implemented")
-}
+func TestRedisCounterWithNilErrors(t *testing.T) {
+	conn := &redisErroneousConn{returnedErr: redis.ErrNil}
 
-func (c *redisConnMock) Err() error {
-	panic("not implemented")
-}
+	limiter := NewRateRedisCounter(conn, "tst", time.Minute, 10*time.Second)
+	total, err := limiter.Total()
 
-func (c *redisConnMock) Flush() error {
-	panic("not implemented")
-}
+	assert.Nil(t, err)
+	assert.Equal(t, int64(0), total)
 
-func (c *redisConnMock) Receive() (reply interface{}, err error) {
-	panic("not implemented")
+	conn.returnedErr = errors.New("boom")
+
+	_, err = limiter.Total()
+	assert.Equal(t, conn.returnedErr, err)
 }
 
 func TestRedisCounter(t *testing.T) {
