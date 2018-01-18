@@ -43,7 +43,7 @@ func (c *RateRedisCounter) IncrBy(val int64) error {
 
 	c.conn.Send("MULTI")
 	c.conn.Send("INCRBY", key, val)
-	c.conn.Send("EXPIRE", key, int(c.resolution/time.Second)+2) // give 2 secs more than the resolution
+	c.conn.Send("EXPIRE", key, int(c.period/time.Second)+1) // give 1 secs more than the resolution
 
 	_, err := c.conn.Do("EXEC")
 	return err
