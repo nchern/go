@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type bucket struct {
+	value     int64
+	timeShard int64
+}
+
 func assertPeriodAndResolutionCorrect(period, resolution time.Duration) {
 	if period < resolution {
 		panic(fmt.Sprintf("period[%v] must be greater or equal to resolution[%v]", period, resolution))
@@ -13,9 +18,9 @@ func assertPeriodAndResolutionCorrect(period, resolution time.Duration) {
 }
 
 type RateBucketCounter struct {
-	prevBucketNo int64
-	buckets      []int64
-	lock         sync.RWMutex
+	buckets []bucket
+
+	lock sync.RWMutex
 
 	period     int64
 	resolution int64
@@ -26,14 +31,14 @@ type RateBucketCounter struct {
 // NewRateBucketCounter initializes new in-memory sharded counter
 // period: defines the maximum period for which we count, e.g. 5m, 1h
 // resolution: defines the resolution of a counter, i.e. the minimum time period of a counter bucket.
-// counter value is calculates as a sum of all bucket values within the last period
+// counter value is calculated as a sum of all bucket values within the last period
 func NewRateBucketCounter(period time.Duration, resoultion time.Duration) *RateBucketCounter {
 	assertPeriodAndResolutionCorrect(period, resoultion)
 	return &RateBucketCounter{
 		timer:      defaultTimer,
 		period:     int64(period),
 		resolution: int64(resoultion),
-		buckets:    make([]int64, int(period/resoultion)),
+		buckets:    make([]bucket, int(period/resoultion)),
 	}
 }
 
@@ -41,13 +46,15 @@ func (c *RateBucketCounter) IncrBy(val int64) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	bucketNo := (c.timer.UnixNano() / c.resolution) % int64(len(c.buckets))
-	if bucketNo != c.prevBucketNo {
-		c.buckets[bucketNo] = 0
-	}
-	c.prevBucketNo = bucketNo
+	curTimeShard := c.timer.UnixNano() / c.resolution
+	bucketNo := curTimeShard % int64(len(c.buckets))
 
-	c.buckets[bucketNo] += val
+	if c.buckets[bucketNo].timeShard == 0 || curTimeShard-c.buckets[bucketNo].timeShard >= c.period/c.resolution {
+		c.buckets[bucketNo].value = 0
+		c.buckets[bucketNo].timeShard = curTimeShard
+	}
+
+	c.buckets[bucketNo].value += val
 
 	return nil
 }
@@ -58,8 +65,12 @@ func (c *RateBucketCounter) Total() (int64, error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	for _, v := range c.buckets {
-		total += v
+	curTimeShard := c.timer.UnixNano() / c.resolution
+	for _, b := range c.buckets {
+		if curTimeShard-b.timeShard > c.period/c.resolution {
+			continue
+		}
+		total += b.value
 	}
 	return total, nil
 }
