@@ -7,6 +7,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
+// RateRedisCounter represents redis-based sharded counter
 type RateRedisCounter struct {
 	timer timer
 
@@ -37,6 +38,7 @@ func NewRateRedisCounter(conn redis.Conn, prefix string, period time.Duration, r
 	}
 }
 
+// IncrBy adds the given value to this counter
 func (c *RateRedisCounter) IncrBy(val int64) error {
 	curTimeShard := c.timer.UnixNano() / int64(c.resolution)
 	key := c.makeKey(curTimeShard)
@@ -53,6 +55,7 @@ func (c *RateRedisCounter) makeKey(timeShard int64) string {
 	return fmt.Sprintf("cnt:%s:%d", c.prefix, timeShard)
 }
 
+// Total returns the total value of this counter
 func (c *RateRedisCounter) Total() (int64, error) {
 	var total int64
 

@@ -17,6 +17,7 @@ func assertPeriodAndResolutionCorrect(period, resolution time.Duration) {
 	}
 }
 
+// RateBucketCounter represents in-memory sharded counter
 type RateBucketCounter struct {
 	buckets []bucket
 
@@ -42,6 +43,7 @@ func NewRateBucketCounter(period time.Duration, resoultion time.Duration) *RateB
 	}
 }
 
+// IncrBy adds the given value to this counter
 func (c *RateBucketCounter) IncrBy(val int64) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -59,6 +61,7 @@ func (c *RateBucketCounter) IncrBy(val int64) error {
 	return nil
 }
 
+// Total returns the total value of this counter
 func (c *RateBucketCounter) Total() (int64, error) {
 	total := int64(0)
 
