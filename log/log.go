@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	// DefaultFlags to use for log package
 	DefaultFlags = log.LstdFlags | log.Lshortfile
 
 	levelDebug = "DEBUG"
@@ -20,13 +21,20 @@ const (
 var (
 	defaultLogger = &defaultImpl{}
 
-	DebugLogger = newLogger(os.Stdout)
-	InfoLogger  = newLogger(os.Stdout)
-	WarnLogger  = newLogger(os.Stderr)
-	ErrorLogger = newLogger(os.Stderr)
+	// DebugLogSink accepts debug entries
+	DebugLogSink = newLogSink(os.Stdout)
+
+	// InfoLogSink accepts info entries
+	InfoLogSink = newLogSink(os.Stdout)
+
+	// WarnLogSink accepts warn entries
+	WarnLogSink = newLogSink(os.Stderr)
+
+	// ErrorLogSink accepts error entries
+	ErrorLogSink = newLogSink(os.Stderr)
 )
 
-func newLogger(writer io.Writer) *log.Logger {
+func newLogSink(writer io.Writer) *log.Logger {
 	return log.New(writer, "", DefaultFlags)
 }
 
@@ -40,6 +48,7 @@ func logIt(l *log.Logger, level, format string, v ...interface{}) {
 	l.Output(3, level+" "+msg)
 }
 
+// Logger defines the logger interface
 type Logger interface {
 	Debug(v ...interface{})
 	Debugf(format string, v ...interface{})
@@ -53,48 +62,49 @@ type Logger interface {
 	Fatal(v ...interface{})
 }
 
+// L is a shortcut to return default logger
 func L() Logger { return defaultLogger }
 
 type defaultImpl struct{}
 
 func (l *defaultImpl) Debug(v ...interface{}) {
-	logIt(DebugLogger, levelDebug, "", v...)
+	logIt(DebugLogSink, levelDebug, "", v...)
 }
 
 func (l *defaultImpl) Debugf(format string, v ...interface{}) {
-	logIt(DebugLogger, levelDebug, format, v...)
+	logIt(DebugLogSink, levelDebug, format, v...)
 }
 
 func (l *defaultImpl) Infof(format string, v ...interface{}) {
-	logIt(InfoLogger, levelInfo, format, v...)
+	logIt(InfoLogSink, levelInfo, format, v...)
 }
 
 func (l *defaultImpl) Info(v ...interface{}) {
-	logIt(InfoLogger, levelInfo, "", v...)
+	logIt(InfoLogSink, levelInfo, "", v...)
 }
 
 func (l *defaultImpl) Errorf(format string, v ...interface{}) {
-	logIt(ErrorLogger, levelError, format, v...)
+	logIt(ErrorLogSink, levelError, format, v...)
 }
 
 func (l *defaultImpl) Error(v ...interface{}) {
-	logIt(ErrorLogger, levelError, "", v...)
+	logIt(ErrorLogSink, levelError, "", v...)
 }
 
 func (l *defaultImpl) Warnf(format string, v ...interface{}) {
-	logIt(WarnLogger, levelWarn, format, v...)
+	logIt(WarnLogSink, levelWarn, format, v...)
 }
 
 func (l *defaultImpl) Warn(v ...interface{}) {
-	logIt(WarnLogger, levelWarn, "", v...)
+	logIt(WarnLogSink, levelWarn, "", v...)
 }
 
 func (l *defaultImpl) Fatalf(format string, v ...interface{}) {
-	logIt(ErrorLogger, levelFatal, format, v...)
+	logIt(ErrorLogSink, levelFatal, format, v...)
 	os.Exit(1)
 }
 
 func (l *defaultImpl) Fatal(v ...interface{}) {
-	logIt(ErrorLogger, levelFatal, "", v...)
+	logIt(ErrorLogSink, levelFatal, "", v...)
 	os.Exit(1)
 }

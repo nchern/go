@@ -33,13 +33,13 @@ type RateBucketCounter struct {
 // period: defines the maximum period for which we count, e.g. 5m, 1h
 // resolution: defines the resolution of a counter, i.e. the minimum time period of a counter bucket.
 // counter value is calculated as a sum of all bucket values within the last period
-func NewRateBucketCounter(period time.Duration, resoultion time.Duration) *RateBucketCounter {
-	assertPeriodAndResolutionCorrect(period, resoultion)
+func NewRateBucketCounter(period time.Duration, resolution time.Duration) *RateBucketCounter {
+	assertPeriodAndResolutionCorrect(period, resolution)
 	return &RateBucketCounter{
 		timer:      defaultTimer,
 		period:     int64(period),
-		resolution: int64(resoultion),
-		buckets:    make([]bucket, int(period/resoultion)),
+		resolution: int64(resolution),
+		buckets:    make([]bucket, int(period/resolution)),
 	}
 }
 

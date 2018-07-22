@@ -28,7 +28,7 @@ func (c *redisConnMockBase) Receive() (reply interface{}, err error) {
 	panic("not implemented")
 }
 
-func (r *redisConnMockBase) Send(commandName string, args ...interface{}) error {
+func (c *redisConnMockBase) Send(commandName string, args ...interface{}) error {
 	panic("not implemented")
 }
 
