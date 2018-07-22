@@ -41,7 +41,7 @@ func BatchFilter(f Filter, inputs ...[]float64) error {
 
 func NaNArray(length int) []float64 {
 	r := make([]float64, length)
-	for i, _ := range r {
+	for i := range r {
 		r[i] = math.NaN()
 	}
 	return r

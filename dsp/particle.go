@@ -48,7 +48,7 @@ func (f *ParticleFilter) Init(length int) Filter {
 
 func (f *ParticleFilter) particles(x0 float64) []float64 {
 	r := NaNArray(f.ParticleCount)
-	for i, _ := range r {
+	for i := range r {
 		r[i] = x0 + (-1+2*rand.Float64())*f.ValueRange
 	}
 	return r

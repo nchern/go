@@ -17,7 +17,7 @@ func FailOnError(err error) {
 
 func sample(n int, stdev float64) []float64 {
 	y := NaNArray(n)
-	for i, _ := range y {
+	for i := range y {
 		y[i] = float64(i) + rand.NormFloat64()*stdev
 	}
 	return y
